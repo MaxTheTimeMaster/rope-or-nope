@@ -1,5 +1,7 @@
 from fastapi.testclient import TestClient
 from app_final import APP_VERSION, app
+import pytest
+from tasks import TASKS, TOKEN_TO_ID
 
 client = TestClient(app)
 
@@ -52,3 +54,9 @@ def test_sample_rejects_too_long_input():
 def test_unknown_task_returns_404():
     response = client.get("/tasks/fizzbuzz/sample")
     assert response.status_code == 404
+
+@pytest.mark.parametrize("name", list(TASKS))
+def test_every_task_produces_known_tokens(name):
+    response = client.get(f"/tasks/{name}/sample", params={"length": 6, "seed": 0})
+    assert response.status_code == 200
+    assert all(token in TOKEN_TO_ID for token in response.json()["target"])
