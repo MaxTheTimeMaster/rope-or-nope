@@ -13,6 +13,7 @@ TASKS = {
     "copy": lambda xs: list(xs),
     "reverse": lambda xs: xs[::-1],
     "sort": sorted,
+    "love 57" : lambda xs: list(map(lambda x: 5 if x % 2 == 0 else 7, list(xs))),
 }
 
 def make_example(task: str, length: int, rng: random.Random) -> tuple[list[str], list[str]]:
