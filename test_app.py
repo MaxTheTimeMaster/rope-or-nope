@@ -17,3 +17,20 @@ def test_root_points_to_docs():
     response = client.get("/")
     assert response.status_code == 200
     assert response.json()["docs"] == "/docs"
+
+def test_list_architectures():
+    response = client.get("/architectures")
+    assert response.status_code == 200
+    names = {arch["name"] for arch in response.json()}
+    assert {"learned", "sinusoidal", "rope", "alibi", "nope"} <= names
+
+
+def test_get_architecture_by_name():
+    response = client.get("/architectures/rope")
+    assert response.status_code == 200
+    assert response.json()["positions"] == "rope"
+
+
+def test_unknown_architecture_returns_404():
+    response = client.get("/architectures/gpt-67")
+    assert response.status_code == 404
