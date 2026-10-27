@@ -34,3 +34,21 @@ def test_get_architecture_by_name():
 def test_unknown_architecture_returns_404():
     response = client.get("/architectures/gpt-67")
     assert response.status_code == 404
+
+
+def test_reverse_sample_is_reversed():
+    response = client.get("/tasks/reverse/sample", params={"length": 5, "seed": 0})
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["input"]) == 5
+    assert data["target"] == data["input"][::-1]
+
+
+def test_sample_rejects_too_long_input():
+    response = client.get("/tasks/copy/sample", params={"length": 1000})
+    assert response.status_code == 422
+
+
+def test_unknown_task_returns_404():
+    response = client.get("/tasks/fizzbuzz/sample")
+    assert response.status_code == 404
