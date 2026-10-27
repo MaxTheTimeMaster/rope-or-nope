@@ -2,6 +2,7 @@ from fastapi.testclient import TestClient
 from app_final import APP_VERSION, app
 import pytest
 from tasks import TASKS, TOKEN_TO_ID
+import logging
 
 client = TestClient(app)
 
@@ -60,3 +61,15 @@ def test_every_task_produces_known_tokens(name):
     response = client.get(f"/tasks/{name}/sample", params={"length": 6, "seed": 0})
     assert response.status_code == 200
     assert all(token in TOKEN_TO_ID for token in response.json()["target"])
+
+def test_sample_uses_default_length_from_settings():
+    from app_final import DEFAULT_SAMPLE_LENGTH
+
+    response = client.get("/tasks/copy/sample")
+    assert len(response.json()["input"]) == DEFAULT_SAMPLE_LENGTH
+
+
+def test_requests_are_logged(caplog):
+    with caplog.at_level(logging.INFO, logger="rope_or_nope"):
+        client.get("/health")
+    assert "GET /health -> 200" in caplog.text
